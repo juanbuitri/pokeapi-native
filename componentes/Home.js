@@ -2,36 +2,37 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 
 export default function Home() {
-  const [data, setData] = useState([]);
-
+  const [usuarios, setUsuarios] = useState([]);
 
   useEffect(() => {
-    const obtenerDatos = async () => {
-      const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1025");
-      const json = await res.json();
-      setData(json.results);
+    const obtenerUsuarios = async () => {
+      try {
+        const res = await fetch("https://fakerapi.it/api/v2/users?_quantity=20");
+        const json = await res.json();
+        setUsuarios(json.data);
+      } catch (error) {
+        console.error("Error al obtener los usuarios:", error);
+      }
     };
 
-    obtenerDatos();
-  }, []); // ← vacío si no usas tipoSeleccionado aún
+    obtenerUsuarios();
+  }, []);
 
   return (
     <ScrollView>
       <View style={styles.lista}>
-        {data.map((pokemon, index) => {
-          const id = pokemon.url.split("/")[6];
-          return (
-            <View key={index} style={styles.item}>
-              <Text>{id} - {pokemon.name}</Text>
-              <Image
-                source={{
-                  uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
-                }}
-                style={styles.imagen}
-              />
-            </View>
-          );
-        })}
+        {usuarios.map((usuario, index) => (
+          <View key={index} style={styles.item}>
+            <Image
+              source={{ uri: usuario.image }}
+              style={styles.imagen}
+            />
+            <Text style={styles.nombre}>
+              {usuario.firstname} {usuario.lastname}
+            </Text>
+            <Text style={styles.email}>{usuario.email}</Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
@@ -41,27 +42,38 @@ const styles = StyleSheet.create({
   lista: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 5,
+    gap: 10,
     justifyContent: 'space-between',
     padding: 10,
   },
   item: {
-    backgroundColor: 'aliceblue',
+    backgroundColor: '#f0f8ff',
     width: '48%',
     padding: 10,
     alignItems: 'center',
     marginBottom: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   imagen: {
     width: 100,
     height: 100,
-    resizeMode: 'contain',
+    borderRadius: 50,
+    marginBottom: 10,
+    resizeMode: 'cover',
   },
-  buscador: {
-    margin: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
+  nombre: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  email: {
+    fontSize: 13,
+    color: '#555',
+    textAlign: 'center',
   },
 });
